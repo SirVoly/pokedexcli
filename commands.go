@@ -44,8 +44,13 @@ func LoadCommands() {
 		},
 		"catch": {
 			name:        "catch <pokemon>",
-			description: "You try and catch the Pokemon!",
+			description: "You try and catch the Pokemon",
 			callback:    commandCatch,
+		},
+		"inspect": {
+			name:        "inspect <pokemon>",
+			description: "You check one of your caught Pokemon",
+			callback:    commandInspect,
 		},
 	}
 }
@@ -166,4 +171,34 @@ func succeedCatch(difficulty int) bool {
 	}
 	prob := 1.0 - float64(difficulty)/400.0 // 0 = 100%, 400 = 0%
 	return rand.Float64() < prob
+}
+
+func commandInspect(cfg *Config) error {
+	if len(cfg.commandArgs) != 1 {
+		return fmt.Errorf("catch takes exactly one argument: the name of the pokemon")
+	}
+
+	pokemonName := cfg.commandArgs[0]
+
+	pokemon, caught := cfg.caughtPokemon[pokemonName]
+
+	if !caught {
+		return fmt.Errorf("you have not caught %s", pokemonName)
+	}
+
+	fmt.Println("Name:", pokemon.Name)
+	fmt.Println("Height:", pokemon.Height)
+	fmt.Println("Weight:", pokemon.Weight)
+
+	fmt.Println("Stats:")
+	for _, stat := range pokemon.Stats {
+		fmt.Printf("\t-%s: %d\n", stat.Stat.Name, stat.BaseStat)
+	}
+
+	fmt.Println("Types:")
+	for _, t := range pokemon.Types {
+		fmt.Printf("\t- %s\n", t.Type.Name)
+	}
+
+	return nil
 }
