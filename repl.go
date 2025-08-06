@@ -18,6 +18,8 @@ func LaunchREPL(cfg *Config) {
 		if !exists {
 			fmt.Println("Unknown command")
 		} else {
+			cfg.commandArgs = input[1:]
+
 			err := command.callback(cfg)
 			if err != nil {
 				fmt.Println(err)

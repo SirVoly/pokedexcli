@@ -8,4 +8,5 @@ type Config struct {
 	pokeapiClient        pokeapi.Client
 	nextLocationsURL     *string
 	previousLocationsURL *string
+	commandArgs          []string
 }

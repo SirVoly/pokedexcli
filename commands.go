@@ -36,6 +36,11 @@ func LoadCommands() {
 			description: "Displays the names of the previous 20 location areas in the Pokemon world",
 			callback:    commandMapb,
 		},
+		"explore": {
+			name:        "explore <location-area>",
+			description: "Displays the names of the pokemon on a specific location in the Pokemon world",
+			callback:    commandExplore,
+		},
 	}
 }
 
@@ -88,5 +93,33 @@ func commandMapb(cfg *Config) error {
 	for _, location := range pokeAPIPageResponse.Results {
 		fmt.Println(location.Name)
 	}
+	return nil
+}
+
+func commandExplore(cfg *Config) error {
+
+	if len(cfg.commandArgs) != 1 {
+		return fmt.Errorf("explore takes exactly one argument: the name of the location area")
+	}
+
+	exploredLocation := cfg.commandArgs[0]
+
+	location, err := cfg.pokeapiClient.GetPokemonsAtLocationList(exploredLocation)
+
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Exploring %s...\n", exploredLocation)
+
+	if len(location.PokemonEncounters) > 0 {
+		fmt.Println("Found Pokemon:")
+		for _, pokemon := range location.PokemonEncounters {
+			fmt.Printf(" - %s\n", pokemon.Pokemon.Name)
+		}
+	} else {
+		fmt.Println("No Pokemon were found.")
+	}
+
 	return nil
 }
