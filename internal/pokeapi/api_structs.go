@@ -5,9 +5,9 @@ type LocationArea struct {
 	URL  string
 }
 
-type PokeAPIPageResponse[T any] struct {
+type PokeAPILocationResponse struct {
 	Count    int
 	Next     *string
 	Previous *string
-	Results  []T
+	Results  []LocationArea
 }

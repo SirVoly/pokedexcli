@@ -1,41 +1,32 @@
 package pokeapi
 
 import (
-	"encoding/json"
+	"io"
 	"net/http"
 )
 
 const (
-	baseURL = "https://pokeapi.co/api/v2"
+	BaseURL = "https://pokeapi.co/api/v2"
 )
 
-func getPaginatedList[T any](c *Client, url string) (PokeAPIPageResponse[T], error) {
-	var pokeAPIPageResponse PokeAPIPageResponse[T]
+func (c *Client) GetLocationsList(url string) ([]byte, error) {
+	var dat []byte
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return pokeAPIPageResponse, err
+		return dat, err
 	}
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return pokeAPIPageResponse, err
+		return dat, err
 	}
 	defer resp.Body.Close()
 
-	decoder := json.NewDecoder(resp.Body)
-	if err := decoder.Decode(&pokeAPIPageResponse); err != nil {
-		return pokeAPIPageResponse, err
+	dat, err = io.ReadAll(resp.Body)
+	if err != nil {
+		return dat, err
 	}
 
-	return pokeAPIPageResponse, nil
-}
-
-func (c *Client) GetLocationsList(pageURL *string) (PokeAPIPageResponse[LocationArea], error) {
-	url := baseURL + "/location-area"
-	if pageURL != nil {
-		url = *pageURL
-	}
-
-	return getPaginatedList[LocationArea](c, url)
+	return dat, nil
 }
