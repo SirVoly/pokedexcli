@@ -23,6 +23,15 @@ func NewCache(interval time.Duration) Cache {
 		interval: interval,
 	}
 
+	go func() {
+		ticker := time.NewTicker(time.Millisecond)
+		defer ticker.Stop()
+		for {
+			<-ticker.C
+			c.reapLoop(interval)
+		}
+	}()
+
 	return c
 }
 
@@ -51,6 +60,13 @@ func (c Cache) Get(key string) ([]byte, bool) {
 	return entry.val, true
 }
 
-// func (c Cache) reapLoop() {
+func (c Cache) reapLoop(duration time.Duration) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 
-// }
+	for key, entry := range c.entries {
+		if time.Since(entry.createdAt) > duration {
+			delete(c.entries, key)
+		}
+	}
+}

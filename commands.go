@@ -1,12 +1,9 @@
 package main
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
-
-	"github.com/SirVoly/pokedexcli/internal/pokeapi"
 )
 
 var commands map[string]cliCommand
@@ -58,26 +55,9 @@ func commandHelp(cfg *Config) error {
 
 func commandMap(cfg *Config) error {
 	// displays the names of the next 20 location areas in the Pokemon world
-	url := pokeapi.BaseURL + "/location-area"
-	if cfg.nextLocationsURL != nil {
-		url = *cfg.nextLocationsURL
-	}
+	pokeAPIPageResponse, err := cfg.pokeapiClient.GetLocationsList(cfg.nextLocationsURL)
 
-	var dat []byte
-	var pokeAPIPageResponse pokeapi.PokeAPILocationResponse
-
-	dat, cached := cfg.pokecache.Get(url)
-	if !cached {
-		fmt.Println("No Cache, getting fresh data!")
-		new_dat, err := cfg.pokeapiClient.GetLocationsList(url)
-		if err != nil {
-			return err
-		}
-		cfg.pokecache.Add(url, new_dat)
-		dat = new_dat
-	}
-
-	if err := json.Unmarshal(dat, &pokeAPIPageResponse); err != nil {
+	if err != nil {
 		return err
 	}
 
@@ -95,23 +75,10 @@ func commandMapb(cfg *Config) error {
 	if cfg.previousLocationsURL == nil {
 		return errors.New("you're on the first page")
 	}
-	url := *cfg.previousLocationsURL
 
-	var dat []byte
-	var pokeAPIPageResponse pokeapi.PokeAPILocationResponse
+	pokeAPIPageResponse, err := cfg.pokeapiClient.GetLocationsList(cfg.previousLocationsURL)
 
-	dat, cached := cfg.pokecache.Get(url)
-	if !cached {
-		fmt.Println("No Cache, getting fresh data!")
-		new_dat, err := cfg.pokeapiClient.GetLocationsList(url)
-		if err != nil {
-			return err
-		}
-		cfg.pokecache.Add(url, new_dat)
-		dat = new_dat
-	}
-
-	if err := json.Unmarshal(dat, &pokeAPIPageResponse); err != nil {
+	if err != nil {
 		return err
 	}
 
