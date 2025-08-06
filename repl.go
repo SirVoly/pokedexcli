@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func LaunchREPL() {
+func LaunchREPL(cfg *Config) {
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
 		fmt.Print("Pokedex > ")
@@ -18,7 +18,7 @@ func LaunchREPL() {
 		if !exists {
 			fmt.Println("Unknown command")
 		} else {
-			err := command.callback()
+			err := command.callback(cfg)
 			if err != nil {
 				fmt.Println(err)
 			}
