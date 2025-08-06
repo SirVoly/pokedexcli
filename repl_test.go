@@ -81,32 +81,34 @@ func TestCleanInput(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		actual := cleanInput(c.input)
+		t.Run(c.input, func(t *testing.T) {
+			actual := cleanInput(c.input)
 
-		// Check length match
-		if len(actual) != len(c.expected) {
-			t.Errorf(`
-Test Failed:
-	input: %v
-	expected: %v
-	actual: %v
-`, c.input, c.expected, actual)
-			continue
-		}
-
-		// Check each word in the slice
-		for i := range actual {
-			word := actual[i]
-			expectedWord := c.expected[i]
-			if word != expectedWord {
+			// Check length match
+			if len(actual) != len(c.expected) {
 				t.Errorf(`
 Test Failed:
 	input: %v
 	expected: %v
 	actual: %v
 `, c.input, c.expected, actual)
-				break
+				return
 			}
-		}
+
+			// Check each word in the slice
+			for i := range actual {
+				word := actual[i]
+				expectedWord := c.expected[i]
+				if word != expectedWord {
+					t.Errorf(`
+Test Failed:
+	input: %v
+	expected: %v
+	actual: %v
+`, c.input, c.expected, actual)
+					break
+				}
+			}
+		})
 	}
 }
