@@ -9,4 +9,5 @@ type Config struct {
 	nextLocationsURL     *string
 	previousLocationsURL *string
 	commandArgs          []string
+	caughtPokemon        map[string]pokeapi.Pokemon
 }

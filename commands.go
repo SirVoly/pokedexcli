@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"math/rand"
 	"os"
 )
 
@@ -40,6 +41,11 @@ func LoadCommands() {
 			name:        "explore <location-area>",
 			description: "Displays the names of the pokemon on a specific location in the Pokemon world",
 			callback:    commandExplore,
+		},
+		"catch": {
+			name:        "catch <pokemon>",
+			description: "You try and catch the Pokemon!",
+			callback:    commandCatch,
 		},
 	}
 }
@@ -122,4 +128,42 @@ func commandExplore(cfg *Config) error {
 	}
 
 	return nil
+}
+
+func commandCatch(cfg *Config) error {
+	if len(cfg.commandArgs) != 1 {
+		return fmt.Errorf("catch takes exactly one argument: the name of the pokemon")
+	}
+
+	pokemonName := cfg.commandArgs[0]
+
+	pokemon, err := cfg.pokeapiClient.GetPokemon(pokemonName)
+
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Throwing a Pokeball at %s...\n", pokemonName)
+
+	success := succeedCatch(pokemon.BaseExperience)
+
+	if success {
+		fmt.Printf("%s was caught!\n", pokemonName)
+		cfg.caughtPokemon[pokemonName] = pokemon
+	} else {
+		fmt.Printf("%s escaped!\n", pokemonName)
+	}
+
+	return nil
+}
+
+func succeedCatch(difficulty int) bool {
+	if difficulty < 0 {
+		difficulty = 0
+	}
+	if difficulty > 400 {
+		difficulty = 400
+	}
+	prob := 1.0 - float64(difficulty)/400.0 // 0 = 100%, 400 = 0%
+	return rand.Float64() < prob
 }

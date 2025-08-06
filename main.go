@@ -12,6 +12,7 @@ func main() {
 
 	cfg := &Config{
 		pokeapiClient: pokeClient,
+		caughtPokemon: make(map[string]pokeapi.Pokemon),
 	}
 
 	LoadCommands()
