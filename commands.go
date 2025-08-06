@@ -52,6 +52,11 @@ func LoadCommands() {
 			description: "You check one of your caught Pokemon",
 			callback:    commandInspect,
 		},
+		"pokedex": {
+			name:        "pokedex",
+			description: "You check all of your caught Pokemon",
+			callback:    commandPokedex,
+		},
 	}
 }
 
@@ -198,6 +203,20 @@ func commandInspect(cfg *Config) error {
 	fmt.Println("Types:")
 	for _, t := range pokemon.Types {
 		fmt.Printf("\t- %s\n", t.Type.Name)
+	}
+
+	return nil
+}
+
+func commandPokedex(cfg *Config) error {
+	fmt.Println("Your Pokedex:")
+
+	if len(cfg.caughtPokemon) == 0 {
+		return fmt.Errorf("you have not caught any pokemon yet")
+	}
+
+	for pokemonName := range cfg.caughtPokemon {
+		fmt.Println("\t- ", pokemonName)
 	}
 
 	return nil
